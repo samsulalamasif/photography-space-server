@@ -51,14 +51,14 @@ async function run() {
         const classCollection = client.db("PhotographySpaceDb").collection("classes");
 
 
-        // JWT Api
+        // JWT Api---------------
         app.post("/jwt", (req, res) => {
             const user = req.body
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" })
             res.send({ token })
         })
 
-        // verify Admin
+        // verify Admin---------------
         const verifyAdmin = async (req, res, next) => {
             const email = req.decoded.email
             const query = { email: email }
@@ -69,13 +69,24 @@ async function run() {
             next()
         }
 
-        // users api get
+        // verify Instructor---------------
+        const verifyInstructor = async (req, res, next) => {
+            const email = req.decoded.email
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            if (user?.role !== "instructor") {
+                return res.status(403).send({ error: true, message: "Forbidden Massage" })
+            }
+            next()
+        }
+
+        // users api get---------------
         app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray()
             res.send(result)
         })
 
-        // users api post
+        // users api post-------------
         app.post("/users", async (req, res) => {
             const user = req.body
             const query = { email: user.email }
@@ -87,7 +98,7 @@ async function run() {
             res.send(result)
         })
 
-        // check admin api
+        // check admin api-----------
         app.get("/users/admin/:email", verifyJWT, async (req, res) => {
             const email = req.params.email
             if (req.decoded.email !== email) {
@@ -100,7 +111,7 @@ async function run() {
         })
 
 
-        // check instructor api
+        // check instructor api-----------
         app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
             const email = req.params.email
             if (req.decoded.email !== email) {
@@ -113,8 +124,7 @@ async function run() {
         })
 
 
-
-        // admin role api
+        // admin role api----------
         app.patch("/users/admin/:id", async (req, res) => {
             const id = req.params.id
             const filter = { _id: new ObjectId(id) }
@@ -128,7 +138,7 @@ async function run() {
         })
 
 
-        // Instructor role api
+        // Instructor role api-----------
         app.patch("/users/instructor/:id", async (req, res) => {
             const id = req.params.id
             const filter = { _id: new ObjectId(id) }
@@ -141,6 +151,14 @@ async function run() {
             res.send(result)
         })
 
+
+
+        // Add Class Post api-----------
+        app.post("/class", verifyJWT, verifyInstructor, async (req, res) => {
+            const addClass = req.body
+            const result = await classCollection.insertOne(addClass)
+            res.send(result)
+        })
 
 
 
