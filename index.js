@@ -48,6 +48,7 @@ async function run() {
         await client.connect();
 
         const usersCollection = client.db("PhotographySpaceDb").collection("users");
+        const classCollection = client.db("PhotographySpaceDb").collection("classes");
 
 
         // JWT Api
@@ -99,7 +100,7 @@ async function run() {
         })
 
 
-        // check admin api
+        // check instructor api
         app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
             const email = req.params.email
             if (req.decoded.email !== email) {
