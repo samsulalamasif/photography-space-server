@@ -49,6 +49,7 @@ async function run() {
 
         const usersCollection = client.db("PhotographySpaceDb").collection("users");
         const classCollection = client.db("PhotographySpaceDb").collection("classes");
+        const cartCollection = client.db("PhotographySpaceDb").collection("carts");
 
 
         // JWT Api---------------
@@ -85,6 +86,8 @@ async function run() {
             const result = await usersCollection.find().toArray()
             res.send(result)
         })
+
+
 
         // users api post-------------
         app.post("/users", async (req, res) => {
@@ -168,12 +171,16 @@ async function run() {
         })
 
 
-        //all class  api
+        //only approved class show all classes api classes route 
         app.get("/allClass", async (req, res) => {
             const result = await classCollection.find({ "status": "approved" }).toArray()
             res.send(result);
+        })
 
-
+        // show all instructor api Instructors route
+        app.get("/allInstructor", async (req, res) => {
+            const result = await usersCollection.find({ "role": "instructor" }).toArray()
+            res.send(result)
         })
 
 
@@ -203,6 +210,12 @@ async function run() {
         })
 
 
+        // select class cart post api
+        app.post("/carts", verifyJWT, async (req, res) => {
+            const selectItem = req.body;
+            const result = await cartCollection.insertOne(selectItem);
+            res.send(result);
+        })
 
 
 
