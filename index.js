@@ -161,6 +161,7 @@ async function run() {
         })
 
 
+        // manage all class  api 
         app.get("/class", async (req, res) => {
             const result = await classCollection.find().toArray()
             res.send(result)
@@ -169,7 +170,7 @@ async function run() {
 
 
         // my classes api----------
-        app.get("/class/:email", verifyJWT, verifyInstructor, async (req, res) => {
+        app.get("/myClasses/:email", verifyJWT, verifyInstructor, async (req, res) => {
             const email = req.params.email
             const query = { userEmail: email }
             const result = await classCollection.find(query).toArray()
