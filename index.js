@@ -161,6 +161,21 @@ async function run() {
         })
 
 
+        app.get("/class", async (req, res) => {
+            const result = await classCollection.find().toArray()
+            res.send(result)
+        })
+
+
+
+        // my classes api----------
+        app.get("/class/:email", verifyJWT, verifyInstructor, async (req, res) => {
+            const email = req.params.email
+            const query = { userEmail: email }
+            const result = await classCollection.find(query).toArray()
+            res.send(result)
+        })
+
 
 
 
