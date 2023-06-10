@@ -161,10 +161,19 @@ async function run() {
         })
 
 
-        // manage all class  api 
-        app.get("/class", async (req, res) => {
+        // manage all class only admin  api 
+        app.get("/class", verifyJWT, verifyAdmin, async (req, res) => {
             const result = await classCollection.find().toArray()
             res.send(result)
+        })
+
+
+        //all class  api
+        app.get("/allClass", async (req, res) => {
+            const result = await classCollection.find({ "status": "approved" }).toArray()
+            res.send(result);
+
+
         })
 
 
@@ -172,12 +181,26 @@ async function run() {
         // my classes api----------
         app.get("/myClasses/:email", verifyJWT, verifyInstructor, async (req, res) => {
             const email = req.params.email
-            const query = { userEmail: email }
+            const query = { email: email }
             const result = await classCollection.find(query).toArray()
             res.send(result)
         })
 
 
+        // admin approved/denied confirm class api
+        app.put("/class/:id", verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const updatedClass = req.body
+            const updateDoc = {
+                $set: {
+                    status: updatedClass.status,
+                    feedback: updatedClass.feedback
+                },
+            };
+            const result = await classCollection.updateOne(query, updateDoc)
+            res.send(result)
+        })
 
 
 
