@@ -55,6 +55,24 @@ async function run() {
         const paymentCollection = client.db("PhotographySpaceDb").collection("payments");
 
 
+
+        //only approved class show all classes api classes route 
+        app.get("/allClass", async (req, res) => {
+            const result = await classCollection.find({ "status": "approved" }).toArray()
+            res.send(result);
+        })
+
+        // show all instructor api Instructors route
+        app.get("/allInstructor", async (req, res) => {
+            const result = await usersCollection.find({ "role": "instructor" }).toArray()
+            res.send(result)
+        })
+
+
+
+
+
+
         // JWT Api---------------
         app.post("/jwt", (req, res) => {
             const user = req.body
@@ -174,18 +192,11 @@ async function run() {
         })
 
 
-        //only approved class show all classes api classes route 
-        app.get("/allClass", async (req, res) => {
-            const result = await classCollection.find({ "status": "approved" }).toArray()
-            res.send(result);
-        })
-
-        // show all instructor api Instructors route
-        app.get("/allInstructor", async (req, res) => {
-            const result = await usersCollection.find({ "role": "instructor" }).toArray()
-            res.send(result)
-        })
-
+        /* ------------------
+        ----allInstructor---- 
+        ----------&---------- 
+        -------allClass------
+        --------------------- */
 
 
         // my classes api----------
@@ -285,14 +296,9 @@ async function run() {
                 return res.status(403).send({ error: true, message: 'forbidden access' })
             }
             const query = { email: email };
-            const result = await paymentCollection.find(query).toArray();
+            const result = await paymentCollection.find(query).sort({ date: -1 }).toArray();
             res.send(result);
         });
-
-
-
-
-
 
 
 
@@ -305,12 +311,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-
-
 
 
 
