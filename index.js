@@ -1,17 +1,24 @@
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+require('dotenv').config()
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const port = process.env.PORT || 5000
+const stripe = require("stripe")(process.env.Payment_Secret_key);
+
 const app = express()
 const cors = require("cors")
-const jwt = require('jsonwebtoken');
-require('dotenv').config()
-const port = process.env.PORT || 5000
 
-const stripe = require("stripe")(process.env.Payment_Secret_key);
 
 
 // Middleware
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200,
+}
+app.use(cors(corsOptions))
 app.use(express.json())
-app.use(cors())
+
 
 const verifyJWT = (req, res, next) => {
     const authorization = req.headers.authorization
@@ -47,7 +54,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         const usersCollection = client.db("PhotographySpaceDb").collection("users");
         const classCollection = client.db("PhotographySpaceDb").collection("classes");
