@@ -239,6 +239,7 @@ async function run() {
         })
 
 
+
         // cart delete api
         app.delete('/carts/:id', async (req, res) => {
             const id = req.params.id;
@@ -271,6 +272,29 @@ async function run() {
             const deleteResult = await cartCollection.deleteOne(query)
             res.send({ insertResult, deleteResult })
         })
+
+
+        // payment api
+        app.get('/payments', verifyJWT, async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                res.send([]);
+            }
+            const decodedEmail = req.decoded.email;
+            if (email !== decodedEmail) {
+                return res.status(403).send({ error: true, message: 'forbidden access' })
+            }
+            const query = { email: email };
+            const result = await paymentCollection.find(query).toArray();
+            res.send(result);
+        });
+
+
+
+
+
+
+
 
 
         await client.db("admin").command({ ping: 1 });
